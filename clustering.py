@@ -1,5 +1,5 @@
 from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans, DBSCAN
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -13,11 +13,10 @@ def applyClustering(X):
     kmeans = KMeans(n_clusters=4, random_state=42)
     kmeans_labels = kmeans.fit_predict(X)
     
-    # DBSCAN Clustering
-    dbscan = DBSCAN(eps=0.3, min_samples=5)
-    dbscan_labels = dbscan.fit_predict(X)
+    # Hierarchical Clustering
+    hierarchical = AgglomerativeClustering(n_clusters=4)
+    hierarchical_labels = hierarchical.fit_predict(X)
     
-    # Visualization
     plt.figure(figsize=(12, 5))
     
     # Plot K-Means clustering result
@@ -27,10 +26,10 @@ def applyClustering(X):
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
     
-    # Plot DBSCAN clustering result
+    # Plot Hierarchical clustering result
     plt.subplot(1, 2, 2)
-    sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=dbscan_labels, palette='viridis', s=50)
-    plt.title("DBSCAN Clustering")
+    sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=hierarchical_labels, palette='viridis', s=50)
+    plt.title("Hierarchical Clustering")
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
     
@@ -44,10 +43,10 @@ def applyClustering(X):
             "Calinski-Harabasz Index": calinski_harabasz_score(X, kmeans_labels),
             "Davies-Bouldin Index": davies_bouldin_score(X, kmeans_labels),
         },
-        "DBSCAN": {
-            "Silhouette Score": silhouette_score(X, dbscan_labels) if len(set(dbscan_labels)) > 1 else "N/A",
-            "Calinski-Harabasz Index": calinski_harabasz_score(X, dbscan_labels) if len(set(dbscan_labels)) > 1 else "N/A",
-            "Davies-Bouldin Index": davies_bouldin_score(X, dbscan_labels) if len(set(dbscan_labels)) > 1 else "N/A",
+        "Hierarchical": {
+            "Silhouette Score": silhouette_score(X, hierarchical_labels) if len(set(hierarchical_labels)) > 1 else "N/A",
+            "Calinski-Harabasz Index": calinski_harabasz_score(X, hierarchical_labels) if len(set(hierarchical_labels)) > 1 else "N/A",
+            "Davies-Bouldin Index": davies_bouldin_score(X, hierarchical_labels) if len(set(hierarchical_labels)) > 1 else "N/A",
         },
     }
     
