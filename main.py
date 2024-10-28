@@ -1,15 +1,21 @@
 from ucimlrepo import fetch_ucirepo 
 from preprocessing import preprocessData
 from clustering import applyClustering
+from eda import performEDA
+import pandas as pd
 
 # fetch dataset
 wine_quality = fetch_ucirepo(id=186) 
 
 # data (as pandas dataframes) 
-X = wine_quality.data.features 
-y = wine_quality.data.targets 
+feature_headers = wine_quality.data.headers[:-2]
 
-# preprocess data
+# Data (as pandas DataFrames)
+X = pd.DataFrame(wine_quality.data.features, columns=feature_headers)
+y = pd.Series(wine_quality.data.targets.squeeze(), name='quality')
+performEDA(X, y)
+
+# Preprocess data
 preprocessedData = preprocessData(wine_quality)
 X = preprocessedData["X"]
 y = preprocessedData["y"]

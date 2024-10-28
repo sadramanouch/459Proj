@@ -3,22 +3,30 @@ from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
 
 def preprocessData(wine_quality):
-  X = wine_quality.data.features 
-  y = wine_quality.data.targets 
+  feature_headers = wine_quality.data.headers[:-2]
 
-  # remove all the rows that have 9 as the class label
-  X = pd.DataFrame(X, columns=wine_quality.data.headers[:-2])
-  y = y.squeeze()
-  X = X[y != 9]
-  y = y[y != 9]
+    # Extract features and target variable
+  X = pd.DataFrame(wine_quality.data.features, columns=feature_headers)
+  y = pd.Series(wine_quality.data.targets.squeeze(), name='quality')
 
-  # normalize/standardize numerical features
+  # Remove rows with class label 9
+  mask = y != 9
+  X = X[mask]
+  y = y[mask]
+
+  # Reset index
+  X.reset_index(drop=True, inplace=True)
+  y.reset_index(drop=True, inplace=True)
+
+  # Check for NaNs in y
+  print("Number of NaNs in y after masking and resetting index:", y.isnull().sum())
+
+  # Normalize/Standardize Numerical Features
   scaler = StandardScaler()
-  scaled_features = scaler.fit_transform(X)
-  X = pd.DataFrame(scaled_features, columns=wine_quality.data.headers[:-2])
+  X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
 
-  # data augmentation using SMOTE
-  smote = SMOTE(k_neighbors=2)
-  X_resampled, y_resampled = smote.fit_resample(X, y)
+  # Data Augmentation using SMOTE
+  smote = SMOTE(k_neighbors=2, random_state=42)
+  X_resampled, y_resampled = smote.fit_resample(X_scaled, y)
 
   return {"X": X_resampled, "y": y_resampled}
