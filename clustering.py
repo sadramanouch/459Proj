@@ -10,11 +10,11 @@ def applyClustering(X):
     X_pca = pca.fit_transform(X)
     
     # K-Means Clustering
-    kmeans = KMeans(n_clusters=3, random_state=42)
+    kmeans = KMeans(n_clusters=4, random_state=42)
     kmeans_labels = kmeans.fit_predict(X)
     
     # DBSCAN Clustering
-    dbscan = DBSCAN(eps=0.5, min_samples=5)
+    dbscan = DBSCAN(eps=0.3, min_samples=5)
     dbscan_labels = dbscan.fit_predict(X)
     
     # Visualization
