@@ -18,9 +18,6 @@ def preprocessData(wine_quality):
   X.reset_index(drop=True, inplace=True)
   y.reset_index(drop=True, inplace=True)
 
-  # Check for NaNs in y
-  print("Number of NaNs in y after masking and resetting index:", y.isnull().sum())
-
   # Normalize/Standardize Numerical Features
   scaler = StandardScaler()
   X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
