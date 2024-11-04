@@ -3,8 +3,9 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
-def applyClustering(X):
+def applyClustering(X, save_path=None):
     # Dimensionality reduction for visualization
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
@@ -17,24 +18,29 @@ def applyClustering(X):
     hierarchical = AgglomerativeClustering(n_clusters=4)
     hierarchical_labels = hierarchical.fit_predict(X)
     
+    if save_path:
+        os.makedirs(save_path, exist_ok=True)
+
+    # Plot and save K-Means clustering result
     plt.figure(figsize=(12, 5))
-    
-    # Plot K-Means clustering result
     plt.subplot(1, 2, 1)
     sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=kmeans_labels, palette='viridis', s=50)
     plt.title("K-Means Clustering")
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
+    if save_path:
+        plt.savefig(os.path.join(save_path, "kmeans_clustering.png"))
     
-    # Plot Hierarchical clustering result
+    # Plot and save Hierarchical clustering result
     plt.subplot(1, 2, 2)
     sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=hierarchical_labels, palette='viridis', s=50)
     plt.title("Hierarchical Clustering")
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
+    if save_path:
+        plt.savefig(os.path.join(save_path, "hierarchical_clustering.png"))
     
-    plt.tight_layout()
-    plt.show()
+    plt.close()
     
     # Evaluate clustering performance
     evaluation_metrics = {
