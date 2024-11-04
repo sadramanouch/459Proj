@@ -25,14 +25,13 @@ X = preprocessedData["X"]
 y = preprocessedData["y"]
 
 # Outlier Detection
-print("Outlier Detection")
-X = outlierDetection(X)
+# print("Outlier Detection")
+# X = outlierDetection(X)
 
-print("Applying Feature Selection - Mutual Information")
+# Clustering with Mutual Information-selected features
 selected_features_mi = mutual_info_selection(X, y)
 X_mi = X[selected_features_mi]
 
-# Clustering with Mutual Information-selected features
 print("Clustering with MI-selected features")
 clustering_results_mi = applyClustering(X_mi, save_path="clustering_plots")
 

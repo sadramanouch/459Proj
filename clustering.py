@@ -21,24 +21,20 @@ def applyClustering(X, save_path=None):
     if save_path:
         os.makedirs(save_path, exist_ok=True)
 
-    # Plot and save K-Means clustering result
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
     sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=kmeans_labels, palette='viridis', s=50)
     plt.title("K-Means Clustering")
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
-    if save_path:
-        plt.savefig(os.path.join(save_path, "kmeans_clustering.png"))
     
-    # Plot and save Hierarchical clustering result
     plt.subplot(1, 2, 2)
     sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=hierarchical_labels, palette='viridis', s=50)
     plt.title("Hierarchical Clustering")
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
     if save_path:
-        plt.savefig(os.path.join(save_path, "hierarchical_clustering.png"))
+        plt.savefig(os.path.join(save_path, "clustering.png"))
     
     plt.close()
     
