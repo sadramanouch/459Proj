@@ -25,8 +25,10 @@ X = preprocessedData["X"]
 y = preprocessedData["y"]
 
 # Outlier Detection
-# print("Outlier Detection")
-# X = outlierDetection(X)
+print("Outlier Detection")
+outliersRemoved = outlierDetection(X, y)
+X = outliersRemoved["X"]
+y = outliersRemoved["y"]
 
 # Clustering with Mutual Information-selected features
 selected_features_mi = mutual_info_selection(X, y)

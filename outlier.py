@@ -4,7 +4,7 @@ from sklearn.decomposition import PCA
 import pandas as pd
 
 # Local Outlier Factor Used since dimensionality of the dataset is not very large
-def outlierDetection(X):
+def outlierDetection(X, y):
   clf = LocalOutlierFactor(n_neighbors=20)
   pca = PCA(n_components=2)
   X_pca = pca.fit_transform(X)
@@ -15,8 +15,8 @@ def outlierDetection(X):
 
   plotOutliers(X_pca)
 
-  X_removed_outliers = removeOutliers(X, outlier_labels)
-  return X_removed_outliers
+  removed_outliers = removeOutliers(X, y, outlier_labels)
+  return {"X": removed_outliers["X"], "y": removed_outliers["y"]}
 
 def plotOutliers(X):
   X_inliers = X[X["outliers"] == 1]
@@ -32,7 +32,8 @@ def plotOutliers(X):
   plt.title("Outlier Detection using Local Outlier Factor")
   plt.show()
 
-def removeOutliers(X, outlier_labels):
+def removeOutliers(X, y, outlier_labels):
   inliers_mask = outlier_labels == 1
   X_cleaned = X[inliers_mask]
-  return X_cleaned
+  y_cleaned = y[inliers_mask]
+  return {"X": X_cleaned, "y": y_cleaned}
