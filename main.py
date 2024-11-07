@@ -5,6 +5,7 @@ from eda import performEDA
 from outlier import outlierDetection
 import pandas as pd
 from feature_selection import mutual_info_selection
+from classification import performClassification
 
 # fetch dataset
 wine_quality = fetch_ucirepo(id=186) 
@@ -42,3 +43,13 @@ for clustering_method, metrics in clustering_results_mi.items():
     print(f"\n{clustering_method} Results:")
     for metric, score in metrics.items():
         print(f"{metric}: {score}")
+
+# Classification
+print("Performing Classification")
+classification_results = performClassification(X_mi, y, save_path="classification_results")
+
+# Print classification evaluation metrics
+for classifier_name, result in classification_results.items():
+    print(f"\n{classifier_name} Test Metrics:")
+    for metric_name, metric_value in result['test_metrics'].items():
+        print(f"{metric_name}: {metric_value}")
