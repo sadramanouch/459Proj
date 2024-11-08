@@ -1,20 +1,19 @@
-from sklearn.neighbors import LocalOutlierFactor
+from sklearn.ensemble import IsolationForest
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import pandas as pd
 
-# Local Outlier Factor Used since dimensionality of the dataset is not very large
 def outlierDetection(X, y):
-  clf = LocalOutlierFactor(n_neighbors=20)
+  clf = IsolationForest(random_state=0)
+  outlier_labels = clf.fit_predict(X)
+
+  # Perform PCA for plotting
   pca = PCA(n_components=2)
   X_pca = pca.fit_transform(X)
-  outlier_labels = clf.fit_predict(X_pca)
-
   X_pca = pd.DataFrame(X_pca, columns=["PC1", "PC2"])
   X_pca["outliers"] = outlier_labels
 
   plotOutliers(X_pca)
-
   removed_outliers = removeOutliers(X, y, outlier_labels)
   return {"X": removed_outliers["X"], "y": removed_outliers["y"]}
 
@@ -29,7 +28,7 @@ def plotOutliers(X):
   plt.xlabel("Component 1")
   plt.ylabel("Component 2")
   plt.legend()
-  plt.title("Outlier Detection using Local Outlier Factor")
+  plt.title("Outlier Detection using Isolation Forest")
   plt.show()
 
 def removeOutliers(X, y, outlier_labels):
