@@ -1,7 +1,6 @@
-import pandas as pd
 import numpy as np
 import os
-from sklearn.model_selection import train_test_split, cross_validate, StratifiedKFold
+from sklearn.model_selection import train_test_split, cross_validate, StratifiedKFold, RandomizedSearchCV
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -130,5 +129,53 @@ def performClassification(X, y, save_path="classification_results"):
             plt.legend(loc="lower right")
             plt.savefig(f"{save_path}/roc_curve_{name.replace(' ', '_')}.png")
             plt.close()
+
+    # perform Random Search on Random Forest for hyperparameter tuning
+    print("\nPerforming Random Search for Random Forest hyperparameter tuning...")
+
+    param_grid = {
+        'n_estimators': [100, 200, 300, 400],
+        'max_depth': [None, 10, 20, 30, 40],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4]
+    }
+
+    random_search_rf = RandomizedSearchCV(
+        classifiers['Random Forest'], param_distributions=param_grid,
+        n_iter=10, scoring='accuracy', cv=skf, random_state=42, n_jobs=-1
+    )
+    random_search_rf.fit(X_train, y_train)
+    tuned_rf = random_search_rf.best_estimator_
+
+    tuned_rf.fit(X_train, y_train)
+    y_pred_tuned = tuned_rf.predict(X_test)
+    y_proba_tuned = tuned_rf.predict_proba(X_test) if hasattr(tuned_rf, "predict_proba") else None
+
+    accuracy_tuned = accuracy_score(y_test, y_pred_tuned)
+    precision_tuned = precision_score(y_test, y_pred_tuned, average='macro', zero_division=0)
+    recall_tuned = recall_score(y_test, y_pred_tuned, average='macro', zero_division=0)
+    f1_tuned = f1_score(y_test, y_pred_tuned, average='macro', zero_division=0)
+
+    if y_proba_tuned is not None:
+        if n_classes > 2:
+            auc_tuned = roc_auc_score(y_test_binarized, y_proba_tuned, average='macro', multi_class='ovo')
+        else:
+            auc_tuned = roc_auc_score(y_test, y_proba_tuned[:, 1])
+    else:
+        auc_tuned = None
+
+    results["Random Forest (Tuned)"] = {
+        'test_metrics': {
+            'accuracy': accuracy_tuned,
+            'precision': precision_tuned,
+            'recall': recall_tuned,
+            'f1_score': f1_tuned,
+            'roc_auc': auc_tuned
+        },
+        'y_test': y_test,
+        'y_pred': y_pred_tuned,
+        'y_proba': y_proba_tuned,
+        'classifier': tuned_rf
+    }
 
     return results
