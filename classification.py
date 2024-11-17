@@ -146,6 +146,12 @@ def performClassification(X, y, save_path="classification_results"):
     )
     random_search_rf.fit(X_train, y_train)
     tuned_rf = random_search_rf.best_estimator_
+    print("Best Parameters:")
+    print(f"n_estimators: {random_search_rf.best_params_["n_estimators"]}")
+    print(f"min_samples_split: {random_search_rf.best_params_["min_samples_split"]}")
+    print(f"min_samples_leaf: {random_search_rf.best_params_["min_samples_leaf"]}")
+    print(f"max_depth: {random_search_rf.best_params_["max_depth"]}")
+    print("\n")
 
     tuned_rf.fit(X_train, y_train)
     y_pred_tuned = tuned_rf.predict(X_test)
