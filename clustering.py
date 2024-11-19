@@ -15,7 +15,7 @@ def applyClustering(X, save_path=None):
     kmeans_labels = kmeans.fit_predict(X)
     
     # Hierarchical Clustering
-    hierarchical = AgglomerativeClustering(n_clusters=4)
+    hierarchical = AgglomerativeClustering(n_clusters=3)
     hierarchical_labels = hierarchical.fit_predict(X)
     
     # DBSCAN Clustering
