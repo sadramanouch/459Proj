@@ -11,7 +11,7 @@ def applyClustering(X, save_path=None):
     X_pca = pca.fit_transform(X)
     
     # K-Means Clustering
-    kmeans = KMeans(n_clusters=4, random_state=42)
+    kmeans = KMeans(n_clusters=3, n_init=10,random_state=42)
     kmeans_labels = kmeans.fit_predict(X)
     
     # Hierarchical Clustering
@@ -19,7 +19,7 @@ def applyClustering(X, save_path=None):
     hierarchical_labels = hierarchical.fit_predict(X)
     
     # DBSCAN Clustering
-    dbscan = DBSCAN(eps=0.5, min_samples=5)
+    dbscan = DBSCAN(eps=2, min_samples=4)
     dbscan_labels = dbscan.fit_predict(X)
     
     if save_path:
