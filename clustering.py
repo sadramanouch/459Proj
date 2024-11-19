@@ -11,11 +11,11 @@ def applyClustering(X, save_path=None):
     X_pca = pca.fit_transform(X)
     
     # K-Means Clustering
-    kmeans = KMeans(n_clusters=3, n_init=10,random_state=42)
+    kmeans = KMeans(n_clusters=4, n_init=10,random_state=42)
     kmeans_labels = kmeans.fit_predict(X)
     
     # Hierarchical Clustering
-    hierarchical = AgglomerativeClustering(n_clusters=3)
+    hierarchical = AgglomerativeClustering(n_clusters=4)
     hierarchical_labels = hierarchical.fit_predict(X)
     
     # DBSCAN Clustering

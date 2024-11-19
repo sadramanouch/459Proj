@@ -66,7 +66,7 @@ def main() -> None:
     # print("Best Hierarchical Parameters:", best_hierarchical_params)
 
     # # DBSCAN
-    # eps_values = np.arange(0.1, 2.0, 0.1)
+    # eps_values = np.linspace(0.1, 2.0, 10)
     # min_samples_values = range(2, 10)
     # best_dbscan_params = tune_dbscan(X, eps_values, min_samples_values)
     # print("Best DBSCAN Parameters:", best_dbscan_params)
