@@ -5,14 +5,9 @@ from imblearn.over_sampling import SMOTE
 def preprocessData(wine_quality):
   feature_headers = wine_quality.data.headers[:-2]
 
-    # Extract features and target variable
+  # Extract features and target variable
   X = pd.DataFrame(wine_quality.data.features, columns=feature_headers)
   y = pd.Series(wine_quality.data.targets.squeeze(), name='quality')
-
-  # Remove rows with class label 9
-  mask = y != 9
-  X = X[mask]
-  y = y[mask]
 
   # Reset index
   X.reset_index(drop=True, inplace=True)
