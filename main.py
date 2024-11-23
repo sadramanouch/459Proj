@@ -24,19 +24,16 @@ def main() -> None:
     # fetch dataset
     wine_quality = fetch_ucirepo(id=186) 
 
-    # data (as pandas dataframes) 
-    feature_headers = wine_quality.data.headers[:-2]
-
     # Data (as pandas DataFrames)
     print("Performing EDA")
-    X = pd.DataFrame(wine_quality.data.features, columns=feature_headers)
-    y = pd.Series(wine_quality.data.targets.squeeze(), name='quality')
-    performEDA(X, y)
+    preprocessedData = preprocessData(wine_quality)
+    X_original = preprocessedData["X"]
+    y_original = preprocessedData["y"]
+    performEDA(X_original, y_original)
 
 
     # Preprocess data
     print("Preprocessing Data")
-    preprocessedData = preprocessData(wine_quality)
     X = preprocessedData["X"]
     y = preprocessedData["y"]
     print(X)

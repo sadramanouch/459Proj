@@ -13,12 +13,4 @@ def preprocessData(wine_quality):
   X.reset_index(drop=True, inplace=True)
   y.reset_index(drop=True, inplace=True)
 
-  # Normalize/Standardize Numerical Features
-  scaler = StandardScaler()
-  X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
-
-  # Data Augmentation using SMOTE
-  smote = SMOTE(k_neighbors=2, random_state=42)
-  X_resampled, y_resampled = smote.fit_resample(X_scaled, y)
-
-  return {"X": X_resampled, "y": y_resampled}
+  return {"X": X, "y": y}
