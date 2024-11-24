@@ -27,9 +27,9 @@ def applyClustering(X, save_path=None):
     dbscan_labels = dbscan.fit_predict(X)
 
     # Plot clustering results
-    # K-Means: Visualize using PCA
     plt.figure(figsize=(20, 6))
 
+    # K-Means: Visualize using PCA
     plt.subplot(1, 3, 1)
     sns.scatterplot(
         x=X_pca[:, 0], y=X_pca[:, 1], hue=kmeans_labels, palette="viridis", s=50
@@ -63,15 +63,9 @@ def applyClustering(X, save_path=None):
     evaluation_metrics = {
         "KMeans": {
             "Silhouette Score": silhouette_score(X, kmeans_labels),
-            "Calinski-Harabasz Index": calinski_harabasz_score(X, kmeans_labels),
         },
         "Hierarchical": {
-            "Silhouette Score": silhouette_score(X, hierarchical_labels)
-            if len(set(hierarchical_labels)) > 1
-            else "N/A",
-            "Calinski-Harabasz Index": calinski_harabasz_score(X, hierarchical_labels)
-            if len(set(hierarchical_labels)) > 1
-            else "N/A",
+            "Calinski-Harabasz Index": calinski_harabasz_score(X, hierarchical_labels),
         },
         "DBSCAN": {
             "Davies-Bouldin Index": davies_bouldin_score(X, dbscan_labels)
