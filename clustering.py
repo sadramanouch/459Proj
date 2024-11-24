@@ -10,7 +10,7 @@ import os
 def applyClustering(X, save_path=None):
     # Dimensionality reduction for visualization
     pca = PCA(n_components=2)
-    tsne = TSNE(n_components=2, random_state=42, perplexity=30, n_iter=300)
+    tsne = TSNE(n_components=2, random_state=42, perplexity=30, max_iter=300)
     X_pca = pca.fit_transform(X)
     X_tsne = tsne.fit_transform(X)
 
