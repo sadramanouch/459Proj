@@ -11,7 +11,7 @@ import argparse
 from clustering_tune import tune_kmeans, tune_hierarchical, tune_dbscan
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
 def parse_args() -> Dict[str, any]:
     parser = argparse.ArgumentParser()
@@ -20,101 +20,77 @@ def parse_args() -> Dict[str, any]:
     args = parser.parse_args()
     return vars(args)
 
-class Data:
-    def __init__(self, features, targets, headers):
-        self.features = features
-        self.targets = targets
-        self.headers = headers
-
-class WineQuality:
-    def __init__(self, data):
-        self.data = data
-
 def main() -> None:
     args = parse_args()
 
-    # Fetch dataset
+    # fetch dataset
     wine_quality = fetch_ucirepo(id=186) 
 
+    # data (as pandas dataframes) 
+    feature_headers = wine_quality.data.headers[:-2]
+
     # Data (as pandas DataFrames)
-    print("Loading Data")
-    # Include all headers
-    all_headers = wine_quality.data.headers
-    # Exclude 'type' and 'quality' columns
-    feature_headers = [h for h in all_headers if h not in ['type', 'quality', 'color']]
+    print("Performing EDA")
+    X = pd.DataFrame(wine_quality.data.features, columns=feature_headers)
+    y = pd.Series(wine_quality.data.targets.squeeze(), name='quality')
+    performEDA(X, y)
 
-    # Create DataFrame with all columns
-    data_df = pd.DataFrame(wine_quality.data.features, columns=all_headers)
-    X_original = data_df[feature_headers]
-    y_original = pd.Series(wine_quality.data.targets.squeeze(), name='quality')
+    X.reset_index(drop=True, inplace=True)
+    y.reset_index(drop=True, inplace=True)
 
-    performEDA(X_original, y_original)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Split the dataset before preprocessing to avoid data leakage
-    X_train_raw, X_test_raw, y_train_raw, y_test_raw = train_test_split(
-        X_original, y_original, test_size=0.2, random_state=42, stratify=y_original
-    )
+    # Preprocess data
+    print("Preprocessing Data")
+    preprocessedData = preprocessData(X, X_train, X_test, y_train)
+    X_train_resampled = preprocessedData["X_train_resampled"]
+    y_train_resampled = preprocessedData["y_train_resampled"]
+    X_test = preprocessedData["X_test"]
 
-    # Create Data object for training data
-    data_train = Data(
-        features=X_train_raw.values, 
-        targets=y_train_raw.values, 
-        headers=feature_headers
-    )
-    # Create WineQuality object for training data
-    wine_quality_train = WineQuality(data=data_train)
-
-    # Preprocess training data
-    print("Preprocessing Training Data")
-    preprocessed_train = preprocessData(wine_quality_train)
-    X_train = preprocessed_train["X"]
-    y_train = preprocessed_train["y"]
-
-    # Feature Selection on Training Data
-    selected_features_mi = mutual_info_selection(X_train, y_train)
-    X_train_mi = X_train[selected_features_mi]
-
-    # Preprocess test data (without SMOTE)
-    print("Preprocessing Test Data")
-    # Fit scaler on X_train before SMOTE
-    scaler = StandardScaler()
-    scaler.fit(X_train_raw[selected_features_mi])
-    X_test_selected = X_test_raw[selected_features_mi]
-    X_test_scaled = pd.DataFrame(scaler.transform(X_test_selected), columns=selected_features_mi)
-    X_test_mi = X_test_scaled
-    y_test = y_test_raw.reset_index(drop=True)
-
-    # Outlier Detection on Training Data (Optional)
+    # Outlier Detection
     print("Outlier Detection")
     outlier_method = args["outlier_method"]
-    outliers_removed = outlierDetection(X_train_mi, y_train, outlier_method)
-    X_train_mi = outliers_removed["X"]
-    y_train = outliers_removed["y"]
+    outliers_removed = outlierDetection(X_train_resampled, y_train_resampled, outlier_method)
+    X = outliers_removed["X"]
+    y = outliers_removed["y"]
+    print(X)
 
-    # Tuning Clustering Algorithms
-    # ========================================
-    # # KMeans
-    # n_clusters_range = range(2, 10)
-    # best_kmeans_params = tune_kmeans(X, n_clusters_range)
-    # print("Best KMeans Parameters:", best_kmeans_params)
+    # Clustering with Mutual Information-selected features
+    selected_features_mi = mutual_info_selection(X, y)
+    X_mi = X[selected_features_mi]
+    X_original_scaled_mi = X_test[selected_features_mi]
 
-    # # Hierarchical Clustering
-    # n_clusters_range = range(2, 10)
-    # best_hierarchical_params = tune_hierarchical(X, n_clusters_range)
-    # print("Best Hierarchical Parameters:", best_hierarchical_params)
+    # # Tuning Clustering Algorithms
+    # # ========================================
+    # # # KMeans
+    # # n_clusters_range = range(2, 10)
+    # # best_kmeans_params = tune_kmeans(X, n_clusters_range)
+    # # print("Best KMeans Parameters:", best_kmeans_params)
 
-    # # DBSCAN
-    # eps_values = np.linspace(0.1, 2.0, 10)
-    # min_samples_values = range(2, 10)
-    # best_dbscan_params = tune_dbscan(X, eps_values, min_samples_values)
-    # print("Best DBSCAN Parameters:", best_dbscan_params)
-    # ========================================
+    # # # Hierarchical Clustering 
+    # # n_clusters_range = range(2, 10)
+    # # best_hierarchical_params = tune_hierarchical(X, n_clusters_range)
+    # # print("Best Hierarchical Parameters:", best_hierarchical_params)
+
+    # # # DBSCAN
+    # # eps_values = np.linspace(0.1, 2.0, 10)
+    # # min_samples_values = range(2, 10)
+    # # best_dbscan_params = tune_dbscan(X, eps_values, min_samples_values)
+    # # print("Best DBSCAN Parameters:", best_dbscan_params)
+    # # ========================================
+
+    print("Clustering with MI-selected features")
+    clustering_results_mi = applyClustering(X_mi, save_path="clustering_plots")
+
+    print("Clustering Evaluation Metrics with MI-selected features:")
+    for clustering_method, metrics in clustering_results_mi.items():
+        print(f"\n{clustering_method} Results:")
+        for metric, score in metrics.items():
+            print(f"{metric}: {score}")
 
     # Classification
     print("Performing Classification")
-    classification_results = performClassification(
-        X_train_mi, y_train, X_test_mi, y_test, save_path="classification_results"
-    )
+    classification_results = performClassification(X_mi, y, X_original_scaled_mi, y_test, save_path="classification_results")
 
     # Print classification evaluation metrics
     for classifier_name, result in classification_results.items():
