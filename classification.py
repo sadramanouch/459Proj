@@ -129,24 +129,20 @@ def performClassification(X_train, y_train, X_test, y_test, save_path="classific
     print("\nPerforming Random Search for Random Forest hyperparameter tuning...")
 
     param_grid = {
-        'n_estimators': [100, 200, 300, 400],
-        'max_depth': [None, 10, 20, 30, 40],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4]
+        'n_estimators': [50, 100, 200, 400, 800],
+        'max_depth': [None, 10, 20, 50, 100],
+        'min_samples_split': [2, 5, 10, 20],
+        'min_samples_leaf': [1, 2, 4, 10],
     }
 
     random_search_rf = RandomizedSearchCV(
         classifiers['Random Forest'], param_distributions=param_grid,
-        n_iter=10, scoring='accuracy', cv=skf, random_state=42, n_jobs=-1
+        n_iter=10, scoring='f1_macro', cv=skf, random_state=42, n_jobs=-1
     )
     random_search_rf.fit(X_train, y_train)
     tuned_rf = random_search_rf.best_estimator_
     print("Best Parameters:")
-    print(f"n_estimators: {random_search_rf.best_params_["n_estimators"]}")
-    print(f"min_samples_split: {random_search_rf.best_params_["min_samples_split"]}")
-    print(f"min_samples_leaf: {random_search_rf.best_params_["min_samples_leaf"]}")
-    print(f"max_depth: {random_search_rf.best_params_["max_depth"]}")
-    print("\n")
+    print(random_search_rf.best_params_)
 
     tuned_rf.fit(X_train, y_train)
     y_pred_tuned = tuned_rf.predict(X_test)
