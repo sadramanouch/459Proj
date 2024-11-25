@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 
 def mutual_info_selection(X, y, k=10):
-    os.makedirs("feature_selection", exist_ok=True)
+    os.makedirs("feature_selection_plots", exist_ok=True)
     
     selector = SelectKBest(mutual_info_classif, k=k)
     selector.fit(X, y)
@@ -22,7 +22,7 @@ def mutual_info_selection(X, y, k=10):
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
 
-    plt.savefig("feature_selection/mutual_info_scores_top_10.png")
+    plt.savefig("feature_selection_plots/mutual_info_scores_top_10.png")
     plt.close()
 
     return X.columns[selector.get_support()]
