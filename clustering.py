@@ -70,7 +70,7 @@ def applyClustering(X, outlier_method, save_path=None):
     plt.ylabel("t-SNE Component 2")
 
     if save_path:
-        plt.savefig(os.path.join(save_path, f"clustering.png_{outlier_method}"))
+        plt.savefig(os.path.join(save_path, f"clustering_{outlier_method}.png"))
     plt.close()
 
     # Evaluate clustering performance
