@@ -2,7 +2,6 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 from sklearn.cluster import DBSCAN, KMeans, AgglomerativeClustering
 import numpy as np
 
-# Tuning KMeans
 def tune_kmeans(X, n_clusters_values):
     best_params = {"n_clusters": None, "n_init": None, "silhouette_score": -1}
     
@@ -19,7 +18,6 @@ def tune_kmeans(X, n_clusters_values):
     
     return best_params
 
-# Tuning Hierarchical Clustering
 def tune_hierarchical(X, n_clusters_values):
     best_params = {"n_clusters": None, "calinski_harabasz_score": -1}
     
@@ -36,7 +34,6 @@ def tune_hierarchical(X, n_clusters_values):
     
     return best_params
 
-# Tuning DBSCAN
 def tune_dbscan(X, eps_values, min_samples_values):
     best_params = {"eps": None, "min_samples": None, "davies_bouldin_score": np.inf}
     

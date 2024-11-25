@@ -6,23 +6,43 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-def applyClustering(X, save_path=None):
+def applyClustering(X, outlier_method, save_path=None):
+    kmeans_clusters = None
+    hierarchical_clusters = None
+    eps = None
+    min_samples = 2
+
+    if outlier_method == "LOF":
+        kmeans_clusters = 2
+        hierarchical_clusters = 2
+        eps = 2
+    elif outlier_method == "IF":
+        kmeans_clusters = 3
+        hierarchical_clusters = 3
+        eps = 0.1
+    elif outlier_method == "EE":
+        kmeans_clusters = 3
+        hierarchical_clusters = 2
+        eps = 0.1
+
     # Dimensionality reduction for visualization
     pca = PCA(n_components=2)
-    tsne = TSNE(n_components=2, random_state=42, perplexity=30, max_iter=300)
     X_pca = pca.fit_transform(X)
+
+    # t-SNE for nonlinear visualization
+    tsne = TSNE(n_components=2, random_state=42)
     X_tsne = tsne.fit_transform(X)
 
     # K-Means Clustering
-    kmeans = KMeans(n_clusters=2, random_state=42)
+    kmeans = KMeans(n_clusters=kmeans_clusters, random_state=42)
     kmeans_labels = kmeans.fit_predict(X)
 
     # Hierarchical Clustering
-    hierarchical = AgglomerativeClustering(n_clusters=2)
+    hierarchical = AgglomerativeClustering(n_clusters=hierarchical_clusters)
     hierarchical_labels = hierarchical.fit_predict(X)
 
     # DBSCAN Clustering
-    dbscan = DBSCAN(eps=2, min_samples=2)
+    dbscan = DBSCAN(eps=eps, min_samples=min_samples)
     dbscan_labels = dbscan.fit_predict(X)
 
     # Plot clustering results
@@ -50,7 +70,7 @@ def applyClustering(X, save_path=None):
     plt.ylabel("t-SNE Component 2")
 
     if save_path:
-        plt.savefig(os.path.join(save_path, "clustering.png"))
+        plt.savefig(os.path.join(save_path, f"clustering.png_{outlier_method}"))
     plt.close()
 
     # Evaluate clustering performance
