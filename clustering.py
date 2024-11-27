@@ -7,6 +7,9 @@ import seaborn as sns
 import os
 
 def applyClustering(X, outlier_method, save_path=None):
+    if save_path and not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     kmeans_clusters = None
     hierarchical_clusters = None
     eps = None
